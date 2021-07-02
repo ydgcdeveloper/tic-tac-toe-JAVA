@@ -7,15 +7,15 @@ package tictactoe;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
@@ -23,9 +23,10 @@ import javax.swing.JPanel;
  * @author Yan David
  */
 public class TicTacToeJFrame extends javax.swing.JFrame {
-    
+
     int clic;
     String status;
+    JPanel panelGrid;
 
     /**
      * Creates new form TicTacToeJFrame
@@ -35,21 +36,22 @@ public class TicTacToeJFrame extends javax.swing.JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         clic = 0;
         status = "RUNNING";
-        
+
         createDashboard();
     }
-    
+
     public void createDashboard() {
-        JPanel panel = new JPanel(new GridLayout(3, 3));
+        panelGrid = new JPanel(new GridLayout(3, 3));
+
         String[][] matrix = {{"-", "-", "-"}, {"-", "-", "-"}, {"-", "-", "-"}};
         for (int i = 0; i < (3 * 3); i++) {
             JButton button = new JButton();
-            button.setLayout(new BorderLayout());
+            button.setLayout(new BorderLayout());            
             button.addActionListener((ActionEvent e) -> {
                 if (status.equals("RUNNING")) {
                     boolean flag = true;
                     String data;
-                    switch (panel.getComponentZOrder(button)) {
+                    switch (panelGrid.getComponentZOrder(button)) {
                         case 0:
                             data = matrix[0][0];
                             if (data.equals("-")) {
@@ -182,26 +184,40 @@ public class TicTacToeJFrame extends javax.swing.JFrame {
                         if ((boolean) object[0]) {
                             System.out.println((String) object[1] + " !!!WON THE GAME!!!");
                             status = "FINISHED";
+                            makeWin(1);
                         }
                     }
                 }
             });
-            panel.add(button);
+            panelGrid.add(button);
         }
-        this.setContentPane(panel);
+        this.setContentPane(panelGrid);
+    }
+
+    public void makeWin(int code) {
+        Component [] components = panelGrid.getComponents();
+        Color [] colors = {Color.BLUE , Color.GREEN};
+        switch(code){
+            case 1: highLightComponent(components, colors);
+                break;
+        }
     }
     
-    public void printMatrix(String[][] matrix) {
-        for (String[] matrix1 : matrix) {
-            for (String matrix11 : matrix1) {
-                System.out.print("    " + matrix11);
+    public void highLightComponent(Component [] components, Color[] colors){
+       // while(status.equals("FINISHED")){
+            for (Component component : components) {
+                for (Color color : colors) {
+                    try {
+                        component.setBackground(color);                
+                        TimeUnit.SECONDS.sleep(100);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(TicTacToeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
             }
-            System.out.println();
-        }
-        System.out.println();
-        System.out.println();
+       // }
     }
-    
+
     public Object[] check3Line(String[][] matrix) {
         String data1 = matrix[0][0];
         String data2 = matrix[0][1];
@@ -212,36 +228,53 @@ public class TicTacToeJFrame extends javax.swing.JFrame {
         String data7 = matrix[2][0];
         String data8 = matrix[2][1];
         String data9 = matrix[2][2];
-        Object[] object = new Object[2];
-        
+        Object[] object = new Object[3];
+
         if (data1.equals(data2) && data1.equals(data3)) {
             object[0] = true;
             object[1] = data1;
+            object[2] = 1;
             return object;
         } else if (data1.equals(data4) && data1.equals(data7)) {
             object[0] = true;
             object[1] = data1;
+            object[2] = 2;
             return object;
         } else if (data3.equals(data6) && data3.equals(data9)) {
             object[0] = true;
             object[1] = data3;
+            object[2] = 3;
             return object;
         } else if (data7.equals(data8) && data7.equals(data9)) {
             object[0] = true;
             object[1] = data7;
+            object[2] = 4;
             return object;
         } else if (data1.equals(data5) && data1.equals(data9)) {
             object[0] = true;
             object[1] = data1;
+            object[2] = 5;
             return object;
         } else if (data3.equals(data5) && data3.equals(data7)) {
             object[0] = true;
             object[1] = data3;
+            object[2] = 6;
             return object;
         }
         object[0] = false;
         object[1] = null;
         return object;
+    }
+    
+        public void printMatrix(String[][] matrix) {
+        for (String[] matrix1 : matrix) {
+            for (String matrix11 : matrix1) {
+                System.out.print("    " + matrix11);
+            }
+            System.out.println();
+        }
+        System.out.println();
+        System.out.println();
     }
 
     /**
